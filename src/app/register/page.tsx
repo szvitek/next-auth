@@ -52,8 +52,6 @@ const Register = () => {
       setError('Errpr! Try again later');
       console.log(error);
     }
-
-    console.log(email, password);
   };
 
   return (
