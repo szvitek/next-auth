@@ -8,13 +8,13 @@ import { FormEvent, useEffect, useState } from 'react';
 const Login = () => {
   const [error, setError] = useState('');
   const router = useRouter();
-  const session = useSession();
+  const { data: session, status: sessionStatus } = useSession();
 
   useEffect(() => {
-    if (session.status === 'authenticated') {
+    if (sessionStatus === 'authenticated') {
       router.replace('/dashboard');
     }
-  }, [session, router]);
+  }, [sessionStatus, router]);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -51,46 +51,52 @@ const Login = () => {
     }
   };
 
+  if (sessionStatus === 'loading') {
+    return <h1>Loading...</h1>;
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="bg-[#212121] p-8 rounded shadow-md w-96">
-        <h1 className="text-4xl text-center font-semibold mb-8">Login</h1>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black"
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black"
-            placeholder="Password"
-            required
-          />
+    sessionStatus !== 'authenticated' && (
+      <div className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="bg-[#212121] p-8 rounded shadow-md w-96">
+          <h1 className="text-4xl text-center font-semibold mb-8">Login</h1>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black"
+              placeholder="Password"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            >
+              Sign In
+            </button>
+            {error && <p className="text-red-600 text-[16px]">{error}</p>}
+          </form>
           <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 mt-4"
+            onClick={() => signIn('github')}
           >
-            Sign In
+            Sign In with Github
           </button>
-          {error && <p className="text-red-600 text-[16px]">{error}</p>}
-        </form>
-        <button
-          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 mt-4"
-          onClick={() => signIn('github')}
-        >
-          Sign In with Github
-        </button>
-        <div className="text-center text-gray-500 mt-4">- OR -</div>
-        <Link
-          href="/register"
-          className="block text-center text-blue-500 hover:underline mt-2"
-        >
-          Register Here
-        </Link>
+          <div className="text-center text-gray-500 mt-4">- OR -</div>
+          <Link
+            href="/register"
+            className="block text-center text-blue-500 hover:underline mt-2"
+          >
+            Register Here
+          </Link>
+        </div>
       </div>
-    </div>
+    )
   );
 };
 export default Login;
